@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Support Customer Relationship Officer Main</title>
+</head>
+
+<body>
+    {% for branch, services in queue.items() %}
+      {% for service, queue_info in services.items() %}
+      <p><input type="radio" name="branch" /> {{ branch }}: {{ (queue_info.normal_queue|length) + (queue_info.priority_queue|length) }} in {{ service }} queue</p>
+      {% endfor %}
+    {% endfor %}
+</body>
+
+</html>

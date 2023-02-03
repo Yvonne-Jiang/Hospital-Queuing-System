@@ -250,15 +250,20 @@ def queue_system(branch, service, counter):
             current_queue.hold()
             write_service_queue(current_queue, queue, branch, service)
 
-        elif request.form['action'] == 'Re-schedule':
-            pass
-        elif request.form['action'] == 'Set priority':
-            pass
+        # elif request.form['action'] == 'Re-schedule':
+        #     pass
+        # elif request.form['action'] == 'Set priority':
+        #     pass
 
     write_queue(queue)
     # current = queue[branch][service]['normal_queue']
     return render_template('counter_main.html', branch_name=branch, service=service, counter_name=counter, current_calling=current_calling)
 
+##### CRO #####
+@app.route("/CRO/main")
+def cro_main():
+    queue = read_queue()
+    return render_template("cro_main.html", queue=queue)
 
 if __name__ == "__main__":
     app.run(debug=True, port=8080)

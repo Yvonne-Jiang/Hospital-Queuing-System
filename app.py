@@ -47,20 +47,27 @@ class ServiceQueue:
             return None
 
     def enqueue(self, new_patient):
-        self.normal_queue.append(new_patient.__dict__)
+        self.normal_queue.append(new_patient)
+    
+    def searchByQnum(self, q_number):
+        # Search the patient by queue number.
+        patient = "Not Found"
+        for patient_dict in self.normal_queue + self.priority_queue:
+            if patient_dict['queue_number'] == q_number:
+                patient = patient_dict
+        return patient
 
+    def searchByID(self, p_id):
+        # Search the patient by patient_id.
+        patient = "Not Found"
+        for patient_dict in self.normal_queue + self.priority_queue:
+            if patient_dict['patient_id'] == p_id:
+                patient = patient_dict
+        return patient
 
-class Patient:
-    def __init__(self):
-        self.patient_id = get_short_id()
-        self.queue_number = None
+    def reschedule(self, q_number):
+        self.normal_queue.append()
 
-    def getQueueNumber(self, queue, prefix="A"):
-        if not queue:
-            return prefix + '001'
-        last_queue_number = queue[-1]['queue_number']
-        last_3_digits = int(last_queue_number[-3:])
-        self.queue_number = prefix + str(last_3_digits + 1).zfill(3)
 
 
 def read_queue():
@@ -128,6 +135,14 @@ def read_service_queue(queue, branch, service):
     s.status = current_q["status"]
     return s
 
+def getQueueNumber(queue, prefix="A"):
+        if not queue:
+            return prefix + '001'
+        idx = []
+        for p in queue:
+            if p['queue_number'][0] == prefix:
+                idx.append(int(p['queue_number'][-3:]))
+        return prefix + str(max(idx) + 1).zfill(3)
 
 def write_service_queue(current_queue, queue, branch, service):
     queue[branch][service] = current_queue.__dict__
@@ -146,8 +161,9 @@ def get_short_id():
         val = int(id[start:end], 16)
         buffer.append(array[val % 62])
     return "".join(buffer)
-##### Patient #####
 
+
+##### Patient #####
 
 @app.route("/patient/main", methods=["GET", "POST"])
 def main():
@@ -157,12 +173,11 @@ def main():
         service = request.form.get("service")
         current_queue = read_service_queue(queue, branch, service)
         prefix = "A" if service == "consulting" else "B"
-        new_patient = Patient()
-        new_patient.getQueueNumber(current_queue.normal_queue, prefix)
+        new_patient = {'patient_id': get_short_id(), 'queue_number': getQueueNumber(current_queue.normal_queue, prefix)}
         current_queue.enqueue(new_patient)
         write_service_queue(current_queue, queue, branch, service)
         write_queue(queue)
-        return redirect(url_for("patient", branch=branch, service=service, patient_id=new_patient.patient_id))
+        return redirect(url_for("patient", branch=branch, service=service, patient_id=new_patient['patient_id']))
     return render_template("patient_main.html", queue=queue)
 
 
@@ -170,14 +185,7 @@ def main():
 def patient(branch, service, patient_id):
     queue = read_queue()
     current_queue = read_service_queue(queue, branch, service)
-    queue_number = "Not Found"
-    for p in current_queue.normal_queue:
-        if p['patient_id'] == patient_id:
-            queue_number= p['queue_number']
-    if queue_number == "Not Found":
-        for p in current_queue.priority_queue:
-            if p['patient_id'] == patient_id:
-                queue_number = p['queue_number']
+    queue_number = current_queue.searchByID(patient_id)['queue_number']
     return render_template("patient_status.html", branch=branch, service=service, queue_number=queue_number)
 
 

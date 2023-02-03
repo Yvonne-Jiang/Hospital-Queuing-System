@@ -1,0 +1,16 @@
+<html>
+  <head>
+    <title>Queue System</title>
+  </head>
+  <body>
+    <h1>Hello, {{ branch_name }} {{ counter_name }}</h1>
+    <p>Current calling of {{service}} is {{ current_calling }}</p>
+
+    <form action="/{{ branch_name }}/{{ counter_name }}/{{ service }}/queue" method="post">
+      <input type="submit" name="action" value="Next">
+      <input type="submit" name="action" value="Hold">
+      <input type="submit" name="action" value="Re-schedule">
+      <input type="submit" name="action" value="Set Priority">
+    </form>
+  </body>
+</html>

@@ -1,0 +1,17 @@
+<html>
+  <head>
+    <title>Reschedule Queue</title>
+  </head>
+  <body>
+    <h1>Reschedule Queue</h1>
+    <form action="/{{branch}}/{{counter}}/queue/reschedule" method="post">
+      <label for="patient_id">Select Patient:</label>
+      <select id="patient_id" name="patient_id">
+        {% for patient in missed_queue %}
+          <option value="{{patient}}">{{patient}}</option>
+        {% endfor %}
+      </select><br><br>
+      <input type="submit" value="Confirm">
+    </form>
+  </body>
+</html>

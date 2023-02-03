@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Patient Main</title>
+</head>
+
+<body>
+  <h2>Please Select the Branch and Service</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Branch</th>
+        <th>Consulting Queue</th>
+        <th>Examination Queue</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for branch, services in queue.items() %}
+          <tr>
+            <td>{{ branch }}</td>
+            <td>{{ (services.consulting.normal_queue|length) + (services.consulting.priority_queue|length) }}</td>
+            <td>{{ (services.examination.normal_queue|length) + (services.examination.priority_queue|length) }}</td>
+          </tr>
+        {% endfor %}
+    </tbody>
+  </table>
+
+  <form method="post">
+    <p>Choose branch:
+      <select name="branch">
+        <option value="branch-1">Branch 1</option>
+        <option value="branch-2">Branch 2</option>
+        <option value="branch-3">Branch 3</option>
+      </select>
+    </p>
+    <p>Choose service:
+      <select name="service">
+        <option value="consulting">Consulting</option>
+        <option value="examination">Examination</option>
+      </select>
+    </p>
+    <button type="submit">Confirm</button>
+  </form>
+
+</body>
+
+</html>

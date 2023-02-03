@@ -1,0 +1,15 @@
+<html>
+  <head>
+    <title>Queue System</title>
+  </head>
+  <body>
+    <h1> Management for {{ branch_name }} {{ service }}</h1>
+    There are {{normal_num}} people in the normal queue and {{priority_num}} people in the priority queue.
+    The queue is now {{status}}.
+    Select the operation:
+    <form method="post">
+      <input type="submit" name="action" value="{{change_status}}">
+      <input type="submit" name="action" value="Re-schedule">
+    </form>
+  </body>
+</html>

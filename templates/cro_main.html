@@ -2,15 +2,38 @@
 <html>
 
 <head>
-    <title>Support Customer Relationship Officer Main</title>
+  <title>Support Customer Relationship Officer Main</title>
 </head>
 
 <body>
-    {% for branch, services in queue.items() %}
-      {% for service, queue_info in services.items() %}
-      <p><input type="radio" name="branch" /> {{ branch }}: {{ (queue_info.normal_queue|length) + (queue_info.priority_queue|length) }} in {{ service }} queue</p>
-      {% endfor %}
-    {% endfor %}
+
+  <h1>Please Choose the Queue You want to manage: </h1>
+
+  <form method="post">
+
+    <table>
+        <thead>
+          <tr>
+            <th>Branch</th>
+            <th>Consulting Queue</th>
+            <th>Examination Queue</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for branch, services in queue.items() %}
+              <tr>
+                <td>{{ branch }}</td>
+                {% for service, queue_info in services.items() %}
+                <td> <input type="radio" name="branch_service" value="{{branch}}_{{service}}"/> {{ (queue_info.normal_queue|length) + (queue_info.priority_queue|length) }} in Queue (Status: {{queue_info.status}})</td>
+                {% endfor %}
+              </tr>
+            {% endfor %}
+        </tbody>
+      </table>
+
+      <button type="submit" name="action" value="Comfirm"> Comfirm </button>
+
+      </form>
 </body>
 
 </html>

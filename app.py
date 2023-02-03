@@ -96,14 +96,11 @@ class ServiceQueue:
         patient_dict = self.searchMiss(q_number, True)
         self.normal_queue.insert(2, patient_dict)
 
-    def setPriority(self, q_number, service):
-        # Delete in normal queue and append to priority queue
-        patient_dict = self.searchNormalQnum(q_number, True)
-        # Give a new queue number
-        prefix = "a" if service == "consulting" else "b"
-        patient_dict["queue_number"] = getQueueNumber(
-            self.priority_queue, prefix)
-        self.priority_queue.append(patient_dict)
+    def stopQueue(self):
+        self.status = "inactive"
+
+    def reInitiateQueue(self):
+        self.status = "active"
 
 
 def read_queue():
@@ -260,10 +257,62 @@ def queue_system(branch, service, counter):
     return render_template('counter_main.html', branch_name=branch, service=service, counter_name=counter, current_calling=current_calling)
 
 ##### CRO #####
-@app.route("/CRO/main")
+
+
+@app.route("/CRO/main", methods=['GET', 'POST'])
 def cro_main():
     queue = read_queue()
+    if request.method == 'POST':
+        branch, service = request.form.get("branch_service").split("_")
+        return redirect(url_for("cro_queue", branch=branch, service=service))
     return render_template("cro_main.html", queue=queue)
+
+
+@app.route("/CRO/<branch>/<service>/queue", methods=['GET', 'POST'])
+def cro_queue(branch, service):
+
+    queue = read_queue()
+    current_queue = read_service_queue(queue, branch, service)
+    normal_num = len(current_queue.normal_queue)
+    priority_num = len(current_queue.priority_queue)
+    status = current_queue.status
+    change_status = "Stop" if status == "active" else 'Re-initiate'
+
+    if request.method == 'POST':
+        if request.form['action'] == "Stop":
+            current_queue.stopQueue()
+            status = current_queue.status
+            change_status = 'Re-initiate'
+            write_service_queue(current_queue, queue, branch, service)
+            write_queue(queue)
+
+        elif request.form['action'] == 'Re-initiate':
+            current_queue.reInitiateQueue()
+            status = current_queue.status
+            change_status = 'Stop'
+            write_service_queue(current_queue, queue, branch, service)
+            write_queue(queue)
+
+        elif request.form['action'] == 'Re-schedule':
+            return redirect(url_for("reschedule", branch=branch, service=service))
+    return render_template('CRO_queue.html', branch_name=branch, service=service, normal_num=normal_num, priority_num=priority_num, status=status, change_status=change_status)
+
+
+@app.route('/CRO/<branch>/<service>/queue/reschedule', methods=['GET', 'POST'])
+def reschedule(branch, service):
+    queue = read_queue()
+    current_queue = read_service_queue(queue, branch, service)
+    missed_nums = [p['queue_number'] for p in current_queue.missed_queue]
+    if request.method == 'POST':
+        # Get the patient number to be re-scheduled
+        patient_number = request.form.get('patient_number')
+        current_queue.reschedule(patient_number)
+        write_service_queue(current_queue, queue, branch, service)
+        write_queue(queue)
+        return redirect(url_for("cro_queue", branch=branch, service=service))
+    
+    return render_template('reschedule.html', branch=branch, service=service, missed_nums=missed_nums)
+
 
 if __name__ == "__main__":
     app.run(debug=True, port=8080)

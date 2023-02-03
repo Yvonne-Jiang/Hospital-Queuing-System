@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Display</title>
+</head>
+
+<body>
+    <h2>{{branch}}</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Examination Queue</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            </tr>
+            <td> Now Serving</td>
+            </tr>
+
+            </tr>
+            <td>{{ex_now_serving}}</td>
+            </tr>
+
+            </tr>
+            <td> Next </td>
+            </tr>
+
+            {% for i in ex_next_serving %}
+            <tr>
+                <td>{{i}}</td>
+            </tr>
+
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Consulting Queue</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            </tr>
+            <td> Now Serving</td>
+            </tr>
+
+            </tr>
+            <td>{{con_now_serving}}</td>
+            </tr>
+
+            </tr>
+            <td> Next </td>
+            </tr>
+
+            {% for i in con_next_serving %}
+            <tr>
+                <td>{{i}}</td>
+            </tr>
+            {% endfor %}
+            
+        </tbody>
+    </table>
+
+</body>
+
+</html>

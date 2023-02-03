@@ -16,6 +16,9 @@ class ServiceQueue:
         self.missed_queue = []
         self.status = "active"
 
+    def queue(self):
+        return self.priority_queue+self.normal_queue
+
     def isNormalEmpty(self) -> bool:
         return True if len(self.normal_queue) == 0 else False
 
@@ -27,6 +30,13 @@ class ServiceQueue:
             return self.priority_queue[0]['queue_number']
         elif not self.isNormalEmpty():
             return self.normal_queue[0]['queue_number']
+        else:
+            return None
+
+    def nextThree(self):
+        lq = len(self.queue())
+        if lq > 0:
+            return [p['queue_number'] for p in self.queue()[1:4]]
         else:
             return None
 
@@ -55,7 +65,7 @@ class ServiceQueue:
     def searchByQnum(self, q_number):
         # Search the patient by queue number.
         patient = "Not Found"
-        for patient_dict in self.normal_queue + self.priority_queue:
+        for patient_dict in self.queue():
             if patient_dict['queue_number'] == q_number:
                 patient = patient_dict
         return patient
@@ -64,20 +74,9 @@ class ServiceQueue:
         # Search the patient by patient_id.
         # For patient status
         patient = "Not Found"
-        for patient_dict in self.normal_queue + self.priority_queue:
+        for patient_dict in self.queue():
             if patient_dict['patient_id'] == p_id:
                 patient = patient_dict
-        return patient
-
-    def searchNormalQnum(self, q_number, delete=False):
-        # Search the patient by queue number in normal queue, can delete.
-        # Help to set priority
-        patient = "Not Found"
-        for patient_dict in self.normal_queue:
-            if patient_dict['queue_number'] == q_number:
-                patient = patient_dict
-        if delete and patient != "Not Found":
-            self.normal_queue.remove(patient)
         return patient
 
     def searchMiss(self, q_number, delete=False):
@@ -310,8 +309,20 @@ def reschedule(branch, service):
         write_service_queue(current_queue, queue, branch, service)
         write_queue(queue)
         return redirect(url_for("cro_queue", branch=branch, service=service))
-    
+
     return render_template('reschedule.html', branch=branch, service=service, missed_nums=missed_nums)
+
+
+@app.route("/<branch>/display", methods=['GET'])
+def display(branch):
+    queue = read_queue()
+    consulting_queue = read_service_queue(queue, branch, "consulting")
+    examination_queue = read_service_queue(queue, branch, "examination")
+    con_now_serving = consulting_queue.front()
+    ex_now_serving = examination_queue.front()
+    con_next_serving = consulting_queue.nextThree()
+    ex_next_serving = examination_queue.nextThree()
+    return render_template('display.html', branch=branch, con_now_serving=con_now_serving, ex_now_serving=ex_now_serving, con_next_serving=con_next_serving, ex_next_serving=ex_next_serving)
 
 
 if __name__ == "__main__":

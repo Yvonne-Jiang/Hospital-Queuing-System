@@ -28,20 +28,22 @@
   </table>
 
   <form method="post">
-    <p>Choose branch:
+    <p>Choose Branch:
       <select name="branch">
         <option value="branch-1">Branch 1</option>
         <option value="branch-2">Branch 2</option>
         <option value="branch-3">Branch 3</option>
       </select>
     </p>
-    <p>Choose service:
+    <p>Choose Service:
       <select name="service">
         <option value="consulting">Consulting</option>
         <option value="examination">Examination</option>
       </select>
     </p>
-    <button type="submit">Confirm</button>
+    <button type="submit" name="priority_type" value="normal_queue">Queue for Normal Queue</button>
+    <button type="submit" name="priority_type" value="priority_queue">Queue for Priority Queue</button>
+
   </form>
 
 </body>

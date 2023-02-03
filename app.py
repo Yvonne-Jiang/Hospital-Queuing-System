@@ -46,9 +46,12 @@ class ServiceQueue:
         else:
             return None
 
-    def enqueue(self, new_patient):
-        self.normal_queue.append(new_patient)
-    
+    def enqueue(self, new_patient, priority_type):
+        if priority_type == "normal_queue":
+            self.normal_queue.append(new_patient)
+        else:
+            self.priority_queue.append(new_patient)
+
     def searchByQnum(self, q_number):
         # Search the patient by queue number.
         patient = "Not Found"
@@ -59,15 +62,48 @@ class ServiceQueue:
 
     def searchByID(self, p_id):
         # Search the patient by patient_id.
+        # For patient status
         patient = "Not Found"
         for patient_dict in self.normal_queue + self.priority_queue:
             if patient_dict['patient_id'] == p_id:
                 patient = patient_dict
         return patient
 
-    def reschedule(self, q_number):
-        self.normal_queue.append()
+    def searchNormalQnum(self, q_number, delete=False):
+        # Search the patient by queue number in normal queue, can delete.
+        # Help to set priority
+        patient = "Not Found"
+        for patient_dict in self.normal_queue:
+            if patient_dict['queue_number'] == q_number:
+                patient = patient_dict
+        if delete and patient != "Not Found":
+            self.normal_queue.remove(patient)
+        return patient
 
+    def searchMiss(self, q_number, delete=False):
+        # Search the patient by queue number.
+        # For re-schedule
+        patient = "Not Found"
+        for patient_dict in self.missed_queue:
+            if patient_dict['queue_number'] == q_number:
+                patient = patient_dict
+        if delete and patient != "Not Found":
+            self.missed_queue.remove(patient)
+        return patient
+
+    def reschedule(self, q_number):
+        # Delete in missed queue and insert into normal queue
+        patient_dict = self.searchMiss(q_number, True)
+        self.normal_queue.insert(2, patient_dict)
+
+    def setPriority(self, q_number, service):
+        # Delete in normal queue and append to priority queue
+        patient_dict = self.searchNormalQnum(q_number, True)
+        # Give a new queue number
+        prefix = "a" if service == "consulting" else "b"
+        patient_dict["queue_number"] = getQueueNumber(
+            self.priority_queue, prefix)
+        self.priority_queue.append(patient_dict)
 
 
 def read_queue():
@@ -135,14 +171,16 @@ def read_service_queue(queue, branch, service):
     s.status = current_q["status"]
     return s
 
+
 def getQueueNumber(queue, prefix="A"):
-        if not queue:
-            return prefix + '001'
-        idx = []
-        for p in queue:
-            if p['queue_number'][0] == prefix:
-                idx.append(int(p['queue_number'][-3:]))
-        return prefix + str(max(idx) + 1).zfill(3)
+    if not queue:
+        return prefix + '001'
+    idx = []
+    for p in queue:
+        if p['queue_number'][0] == prefix:
+            idx.append(int(p['queue_number'][-3:]))
+    return prefix + str(max(idx) + 1).zfill(3)
+
 
 def write_service_queue(current_queue, queue, branch, service):
     queue[branch][service] = current_queue.__dict__
@@ -171,10 +209,15 @@ def main():
     if request.method == "POST":
         branch = request.form.get("branch")
         service = request.form.get("service")
+        priority_type = request.form["priority_type"]
         current_queue = read_service_queue(queue, branch, service)
         prefix = "A" if service == "consulting" else "B"
-        new_patient = {'patient_id': get_short_id(), 'queue_number': getQueueNumber(current_queue.normal_queue, prefix)}
-        current_queue.enqueue(new_patient)
+        if priority_type == "priority_queue":
+            prefix = prefix.lower()
+        new_patient = {'patient_id': get_short_id(), 'queue_number': getQueueNumber(
+            eval("current_queue."+priority_type), prefix)}
+        current_queue.enqueue(new_patient, priority_type)
+        print(new_patient)
         write_service_queue(current_queue, queue, branch, service)
         write_queue(queue)
         return redirect(url_for("patient", branch=branch, service=service, patient_id=new_patient['patient_id']))

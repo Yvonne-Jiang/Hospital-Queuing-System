@@ -6,45 +6,40 @@
 </head>
 
 <body>
+
+
   <h2>Please Select the Branch and Service</h2>
 
-  <table>
-    <thead>
-      <tr>
-        <th>Branch</th>
-        <th>Consulting Queue</th>
-        <th>Examination Queue</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for branch, services in queue.items() %}
-          <tr>
-            <td>{{ branch }}</td>
-            <td>{{ (services.consulting.normal_queue|length) + (services.consulting.priority_queue|length) }}</td>
-            <td>{{ (services.examination.normal_queue|length) + (services.examination.priority_queue|length) }}</td>
-          </tr>
-        {% endfor %}
-    </tbody>
-  </table>
-
   <form method="post">
-    <p>Choose Branch:
-      <select name="branch">
-        <option value="branch-1">Branch 1</option>
-        <option value="branch-2">Branch 2</option>
-        <option value="branch-3">Branch 3</option>
-      </select>
-    </p>
-    <p>Choose Service:
-      <select name="service">
-        <option value="consulting">Consulting</option>
-        <option value="examination">Examination</option>
-      </select>
-    </p>
-    <button type="submit" name="priority_type" value="normal_queue">Queue for Normal Queue</button>
-    <button type="submit" name="priority_type" value="priority_queue">Queue for Priority Queue</button>
 
-  </form>
+    <table>
+        <thead>
+          <tr>
+            <th>Branch</th>
+            <th>Consulting Queue</th>
+            <th>Examination Queue</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for branch, services in queue.items() %}
+              <tr>
+                <td>{{ branch }}</td>
+                {% for service, queue_info in services.items() %}
+                {% if queue_info.status == "inactive" %}
+                {% set b = "disabled = 'true'"%}
+                {% else %}
+                {% set b = ""%}
+                {% endif %}
+                <td> <input type="radio" name="branch_service" value="{{branch}}_{{service}}" {{b}}/> {{ (queue_info.normal_queue|length) + (queue_info.priority_queue|length) }} in Queue (Status: {{queue_info.status}})</td>
+                {% endfor %}
+              </tr>
+            {% endfor %}
+        </tbody>
+      </table>
+
+      <button type="submit" name="priority_type" value="normal_queue">Queue for Normal Queue</button>
+    <button type="submit" name="priority_type" value="priority_queue">Queue for Priority Queue</button>
+      </form>
 
 </body>
 

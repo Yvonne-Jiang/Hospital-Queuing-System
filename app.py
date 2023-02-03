@@ -202,23 +202,20 @@ def get_short_id():
 @app.route("/patient/main", methods=["GET", "POST"])
 def main():
     queue = read_queue()
-    if request.method == "POST":
-        branch = request.form.get("branch")
-        service = request.form.get("service")
-        priority_type = request.form["priority_type"]
+    if request.method == 'POST':
+        branch, service = request.form.get("branch_service").split("_")
         current_queue = read_service_queue(queue, branch, service)
         prefix = "A" if service == "consulting" else "B"
+        priority_type = request.form["priority_type"]
         if priority_type == "priority_queue":
             prefix = prefix.lower()
         new_patient = {'patient_id': get_short_id(), 'queue_number': getQueueNumber(
             eval("current_queue."+priority_type), prefix)}
         current_queue.enqueue(new_patient, priority_type)
-        print(new_patient)
         write_service_queue(current_queue, queue, branch, service)
         write_queue(queue)
         return redirect(url_for("patient", branch=branch, service=service, patient_id=new_patient['patient_id']))
     return render_template("patient_main.html", queue=queue)
-
 
 @app.route("/patient/<branch>/<service>/<patient_id>")
 def patient(branch, service, patient_id):

@@ -1,6 +1,5 @@
-import os
 import json
-import time
+import os
 import uuid
 
 from flask import Flask, redirect, render_template, request, url_for
@@ -17,7 +16,7 @@ class ServiceQueue:
         self.status = "active"
 
     def queue(self):
-        return self.priority_queue+self.normal_queue
+        return self.priority_queue + self.normal_queue
 
     def isNormalEmpty(self) -> bool:
         return True if len(self.normal_queue) == 0 else False
@@ -64,7 +63,7 @@ class ServiceQueue:
 
     def searchByQnum(self, q_number):
         # Search the patient by queue number.
-        patient = "Not Found"
+        patient = None
         for patient_dict in self.queue():
             if patient_dict['queue_number'] == q_number:
                 patient = patient_dict
@@ -73,7 +72,7 @@ class ServiceQueue:
     def searchByID(self, p_id):
         # Search the patient by patient_id.
         # For patient status
-        patient = "Not Found"
+        patient = None
         for patient_dict in self.queue():
             if patient_dict['patient_id'] == p_id:
                 patient = patient_dict
@@ -82,11 +81,11 @@ class ServiceQueue:
     def searchMiss(self, q_number, delete=False):
         # Search the patient by queue number.
         # For re-schedule
-        patient = "Not Found"
+        patient = None
         for patient_dict in self.missed_queue:
             if patient_dict['queue_number'] == q_number:
                 patient = patient_dict
-        if delete and patient != "Not Found":
+        if delete and patient != None:
             self.missed_queue.remove(patient)
         return patient
 
@@ -107,6 +106,7 @@ def read_queue():
         with open("queue.txt", "r") as f:
             return json.load(f)
     else:
+        print("create queue")
         return {
             "branch-1": {
                 "consulting": {
@@ -184,8 +184,10 @@ def write_service_queue(current_queue, queue, branch, service):
 
 def get_short_id():
     array = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
-             "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
-             "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"
+             "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u",
+             "v", "w", "x", "y", "z",
+             "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U",
+             "V", "W", "X", "Y", "Z"
              ]
     id = str(uuid.uuid4()).replace("-", '')  # 注意这里需要用uuid4
     buffer = []
@@ -210,12 +212,13 @@ def main():
         if priority_type == "priority_queue":
             prefix = prefix.lower()
         new_patient = {'patient_id': get_short_id(), 'queue_number': getQueueNumber(
-            eval("current_queue."+priority_type), prefix)}
+            eval("current_queue." + priority_type), prefix)}
         current_queue.enqueue(new_patient, priority_type)
         write_service_queue(current_queue, queue, branch, service)
         write_queue(queue)
         return redirect(url_for("patient", branch=branch, service=service, patient_id=new_patient['patient_id']))
     return render_template("patient_main.html", queue=queue)
+
 
 @app.route("/patient/<branch>/<service>/<patient_id>")
 def patient(branch, service, patient_id):
@@ -250,10 +253,11 @@ def queue_system(branch, service, counter):
 
     write_queue(queue)
     # current = queue[branch][service]['normal_queue']
-    return render_template('counter_main.html', branch_name=branch, service=service, counter_name=counter, current_calling=current_calling)
+    return render_template('counter_main.html', branch_name=branch, service=service, counter_name=counter,
+                           current_calling=current_calling)
+
 
 ##### CRO #####
-
 
 @app.route("/CRO/main", methods=['GET', 'POST'])
 def cro_main():
@@ -324,8 +328,10 @@ def display(branch):
     ex_now_serving = examination_queue.front()
     con_next_serving = consulting_queue.nextThree()
     ex_next_serving = examination_queue.nextThree()
-    return render_template('display.html', branch=branch, con_now_serving=con_now_serving, ex_now_serving=ex_now_serving, con_next_serving=con_next_serving, ex_next_serving=ex_next_serving)
+    return render_template('display.html', branch=branch, con_now_serving=con_now_serving,
+                           ex_now_serving=ex_now_serving, con_next_serving=con_next_serving,
+                           ex_next_serving=ex_next_serving)
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=8080)
+    app.run(debug=True, port=8000)

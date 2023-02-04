@@ -1,17 +1,29 @@
 <html>
-  <head>
-    <title>Reschedule Queue</title>
-  </head>
-  <body>
-    <h1>Reschedule Queue</h1>
-    <form method="post">
-      <label for="patient_number">Select Patient:</label>
-      <select id="patient_number" name="patient_number">
-        {% for patient in missed_nums %}
-          <option value="{{patient}}">{{patient}}</option>
-        {% endfor %}
-      </select><br><br>
-      <input type="submit" value="Confirm">
-    </form>
-  </body>
+<meta http-equiv="refresh" content = "2">
+<head>
+    <title>Queue System</title>
+</head>
+
+<body>
+<h1> Management for {{ branch_name }} {{ service }}</h1>
+There are {{ normal_num }} people in the normal queue and {{ priority_num }} people in the priority queue.
+The queue is now {{ status }}.
+Select the operation:
+
+<form method="post" action="/CRO/{{ branch }}/{{ service }}/queue">
+    <input type="submit" name="action" value="{{ change_status }}">
+    <input type="submit" name="action" value="Re-schedule">
+</form>
+
+<form method="post">
+<label for="patient_number">Select Patient:</label>
+  <select id="patient_number" name="patient_number">
+    {% for patient in missed_nums %}
+        <option value="{{ patient }}">{{ patient }}</option>
+    {% endfor %}
+</select>
+<input type="submit" value="Confirm">
+</form>
+
+</body>
 </html>

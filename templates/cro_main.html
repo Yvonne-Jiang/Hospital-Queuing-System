@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html>
-<meta http-equiv="refresh" content = "2">
 <head>
   <title>Support Customer Relationship Officer Main</title>
 </head>
@@ -9,8 +8,7 @@
 
   <h1>Please Choose the Queue You want to manage: </h1>
 
-  <form method="post">
-
+<form method="post" onsubmit="return validateForm()">
     <table>
         <thead>
           <tr>
@@ -31,9 +29,25 @@
         </tbody>
       </table>
 
-      <button type="submit" name="action" value="Comfirm"> Comfirm </button>
+      <button type="submit" name="action" value="Confirm"> Confirm </button>
 
       </form>
+<script>
+    function validateForm() {
+        let radioButtons = document.getElementsByName("branch_service");
+        let checked = false;
+        for (let i = 0; i < radioButtons.length; i++) {
+            if (radioButtons[i].checked) {
+                checked = true;
+            }
+        }
+        if (!checked) {
+            alert("Please select an branch and option");
+            return false;
+        }
+        return true;
+    }
+</script>
 </body>
 
 </html>

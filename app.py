@@ -4,7 +4,7 @@ import uuid
 
 from flask import Flask, redirect, render_template, request, url_for
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static')
 
 
 class ServiceQueue:
@@ -67,16 +67,27 @@ class ServiceQueue:
         for patient_dict in self.queue():
             if patient_dict['queue_number'] == q_number:
                 patient = patient_dict
+                break
         return patient
 
     def searchByID(self, p_id):
         # Search the patient by patient_id.
         # For patient status
         patient = None
+        wait = -1
         for patient_dict in self.queue():
+            wait += 1
             if patient_dict['patient_id'] == p_id:
                 patient = patient_dict
-        return patient
+                break
+        if patient is None:
+            for patient_dict in self.missed_queue:
+                if patient_dict['patient_id'] == p_id:
+                    wait = -2
+                    break
+            if wait != -2:
+                wait = -3
+        return patient, wait
 
     def searchMiss(self, q_number, delete=False):
         # Search the patient by queue number.
@@ -85,6 +96,7 @@ class ServiceQueue:
         for patient_dict in self.missed_queue:
             if patient_dict['queue_number'] == q_number:
                 patient = patient_dict
+                break
         if delete and patient != None:
             self.missed_queue.remove(patient)
         return patient
@@ -202,7 +214,7 @@ def get_short_id():
 ##### Patient #####
 
 @app.route("/patient/main", methods=["GET", "POST"])
-def main():
+def patient_main():
     queue = read_queue()
     if request.method == 'POST':
         branch, service = request.form.get("branch_service").split("_")
@@ -220,41 +232,44 @@ def main():
     return render_template("patient_main.html", queue=queue)
 
 
-@app.route("/patient/<branch>/<service>/<patient_id>")
+@app.route("/patient/<branch>/<service>/<patient_id>", methods=["GET", "POST"])
 def patient(branch, service, patient_id):
     queue = read_queue()
+    queue_number = None
     current_queue = read_service_queue(queue, branch, service)
-    queue_number = current_queue.searchByID(patient_id)['queue_number']
-    return render_template("patient_status.html", branch=branch, service=service, queue_number=queue_number)
+    wait = current_queue.searchByID(patient_id)[1]
+    if wait > -1:
+        queue_number = current_queue.searchByID(patient_id)[0]['queue_number']
+    if request.method == 'POST':
+        print("Return to the Patient Main Page.")
+        return redirect(url_for("patient_main"))
+    return render_template("patient_status.html", branch=branch, service=service, queue_number=queue_number, wait=wait)
 
 
 ##### Counter #####
 @app.route('/<branch>/<counter>/<service>/queue', methods=['GET', 'POST'])
-def queue_system(branch, service, counter):
+def counter(branch, service, counter):
     queue = read_queue()
     current_queue = read_service_queue(queue, branch, service)
-    current_calling = current_queue.front()
-
+    now_serving = current_queue.front()
+    next_serving = current_queue.nextThree()
     if request.method == 'POST':
         if request.form['action'] == "Next":
             print("Next")
             current_queue.next()
             write_service_queue(current_queue, queue, branch, service)
+            write_queue(queue)
 
         elif request.form['action'] == 'Hold':
             print("Next")
             current_queue.hold()
             write_service_queue(current_queue, queue, branch, service)
+            write_queue(queue)
 
-        # elif request.form['action'] == 'Re-schedule':
-        #     pass
-        # elif request.form['action'] == 'Set priority':
-        #     pass
-
-    write_queue(queue)
-    # current = queue[branch][service]['normal_queue']
+    now_serving = current_queue.front()
+    next_serving = current_queue.nextThree()
     return render_template('counter_main.html', branch_name=branch, service=service, counter_name=counter,
-                           current_calling=current_calling)
+                           now_serving=now_serving, next_serving=next_serving)
 
 
 ##### CRO #####
@@ -276,6 +291,8 @@ def cro_queue(branch, service):
     priority_num = len(current_queue.priority_queue)
     status = current_queue.status
     change_status = "Stop" if status == "active" else 'Re-initiate'
+    now_serving = current_queue.front()
+    next_serving = current_queue.nextThree()
 
     if request.method == 'POST':
         if request.form['action'] == "Stop":
@@ -292,10 +309,17 @@ def cro_queue(branch, service):
             write_service_queue(current_queue, queue, branch, service)
             write_queue(queue)
 
+        elif request.form['action'] == "Return":
+            return redirect(url_for("cro_main"))
+
         elif request.form['action'] == 'Re-schedule':
             return redirect(url_for("reschedule", branch=branch, service=service))
+
     return render_template('cro_queue.html', branch_name=branch, service=service, normal_num=normal_num,
-                           priority_num=priority_num, status=status, change_status=change_status)
+                           priority_num=priority_num, status=status, change_status=change_status,
+                           now_serving=now_serving, next_serving=next_serving)
+
+
 
 
 @app.route('/CRO/<branch>/<service>/queue/reschedule', methods=['GET', 'POST'])
@@ -306,19 +330,23 @@ def reschedule(branch, service):
     priority_num = len(current_queue.priority_queue)
     status = current_queue.status
     change_status = "Stop" if status == "active" else 'Re-initiate'
+    now_serving = current_queue.front()
+    next_serving = current_queue.nextThree()
     missed_nums = [p['queue_number'] for p in current_queue.missed_queue]
     if request.method == 'POST':
-        # Get the patient number to be re-scheduled
         patient_number = request.form.get('patient_number')
-        current_queue.reschedule(patient_number)
-        write_service_queue(current_queue, queue, branch, service)
-        write_queue(queue)
+        if patient_number is not None:
+            current_queue.reschedule(patient_number)
+            write_service_queue(current_queue, queue, branch, service)
+            write_queue(queue)
         return redirect(url_for("cro_queue", branch=branch, service=service))
 
     return render_template('reschedule.html', branch_name=branch, service=service, normal_num=normal_num,
-                           priority_num=priority_num, status=status, change_status=change_status)
+                           priority_num=priority_num, status=status, change_status=change_status,
+                           missed_nums=missed_nums, now_serving=now_serving, next_serving=next_serving)
 
 
+##### Display #####
 @app.route("/<branch>/display", methods=['GET'])
 def display(branch):
     queue = read_queue()
@@ -334,4 +362,4 @@ def display(branch):
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=8000)
+    app.run(debug=True, port=8080)

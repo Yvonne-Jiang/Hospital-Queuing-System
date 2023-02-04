@@ -2,45 +2,64 @@
 <html>
 
 <head>
-  <title>Patient Main</title>
+    <title>Patient Main</title>
 </head>
 
 <body>
 
 
-  <h2>Please Select the Branch and Service</h2>
+<h2>Please Select the Branch and Service</h2>
 
-  <form method="post">
+<form method="post" onsubmit="return validateForm()">
 
     <table>
         <thead>
-          <tr>
+        <tr>
             <th>Branch</th>
             <th>Consulting Queue</th>
             <th>Examination Queue</th>
-          </tr>
+        </tr>
         </thead>
         <tbody>
-          {% for branch, services in queue.items() %}
-              <tr>
+        {% for branch, services in queue.items() %}
+            <tr>
                 <td>{{ branch }}</td>
                 {% for service, queue_info in services.items() %}
-                {% if queue_info.status == "inactive" %}
-                {% set b = "disabled = 'true'"%}
-                {% else %}
-                {% set b = ""%}
-                {% endif %}
-                <td> <input type="radio" name="branch_service" value="{{branch}}_{{service}}" {{b}}/> {{ (queue_info.normal_queue|length) + (queue_info.priority_queue|length) }} in Queue (Status: {{queue_info.status}})</td>
+                    {% if queue_info.status == "inactive" %}
+                        {% set b = "disabled = 'true'" %}
+                    {% else %}
+                        {% set b = "" %}
+                    {% endif %}
+                    <td><input type="radio" name="branch_service"
+                               value="{{ branch }}_{{ service }}" {{ b }}/> {{ (queue_info.normal_queue|length) + (queue_info.priority_queue|length) }}
+                        in Queue (Status: {{ queue_info.status }})
+                    </td>
                 {% endfor %}
-              </tr>
-            {% endfor %}
+            </tr>
+        {% endfor %}
         </tbody>
-      </table>
+    </table>
 
-      <button type="submit" name="priority_type" value="normal_queue">Queue for Normal Queue</button>
+    <button type="submit" name="priority_type" value="normal_queue">Queue for Normal Queue</button>
     <button type="submit" name="priority_type" value="priority_queue">Queue for Priority Queue</button>
-      </form>
+</form>
 
+<script>
+    function validateForm() {
+        let radioButtons = document.getElementsByName("branch_service");
+        let checked = false;
+        for (let i = 0; i < radioButtons.length; i++) {
+            if (radioButtons[i].checked) {
+                checked = true;
+            }
+        }
+        if (!checked) {
+            alert("Please select an branch and option");
+            return false;
+        }
+        return true;
+    }
+</script>
 </body>
 
 </html>

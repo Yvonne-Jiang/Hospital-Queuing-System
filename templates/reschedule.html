@@ -1,5 +1,6 @@
 <html>
-<meta http-equiv="refresh" content = "2">
+<!-- <meta http-equiv="refresh" content = "2"> -->
+
 <head>
     <title>Queue System</title>
 </head>
@@ -8,22 +9,84 @@
 <h1> Management for {{ branch_name }} {{ service }}</h1>
 There are {{ normal_num }} people in the normal queue and {{ priority_num }} people in the priority queue.
 The queue is now {{ status }}.
+
+<table>
+    <thead>
+    <tr>
+        <th>Queuing Details</th>
+    </tr>
+    </thead>
+    <tbody>
+
+    </tr>
+    <td>Now Serving</td>
+    </tr>
+
+    </tr>
+    {% if now_serving is not none %}
+        <td>{{ now_serving }}</td>
+    {% else %}
+        <tr>
+            <td>Empty Queue</td>
+        </tr>
+    {% endif %}
+    </tr>
+
+    </tr>
+    <td> Next</td>
+    </tr>
+    {% if next_serving is not none %}
+        {% for i in next_serving %}
+            <tr>
+                <td>{{ i }}</td>
+            </tr>
+        {% endfor %}
+    {% else %}
+        <tr>
+            <td>Empty Queue</td>
+        </tr>
+    {% endif %}
+
+    </tbody>
+</table>
+
 Select the operation:
 
 <form method="post" action="/CRO/{{ branch }}/{{ service }}/queue">
-    <input type="submit" name="action" value="{{ change_status }}">
-    <input type="submit" name="action" value="Re-schedule">
+    <input type="submit" name="action" value="{{ change_status }}" disabled>
+    <input type="submit" name="action" value="Re-schedule" disabled>
+    <input type="submit" name="action" value="Return" disabled>
 </form>
 
 <form method="post">
-<label for="patient_number">Select Patient:</label>
-  <select id="patient_number" name="patient_number">
-    {% for patient in missed_nums %}
-        <option value="{{ patient }}">{{ patient }}</option>
-    {% endfor %}
-</select>
-<input type="submit" value="Confirm">
+    <label for="patient_number">Select Patient:</label>
+{% if missed_nums|length > 0 %}
+    <select id="patient_number" name="patient_number">
+        <option value="">---Select---</option>
+        {% for patient in missed_nums %}
+            <option value="{{ patient }}">{{ patient }}</option>
+        {% endfor %}
+    </select>
+    <input type="submit" id="confirm" value="Confirm" disabled>
+    {% else %}
+    <p>No Missing Number</p>
+    <input type="submit" id="confirm" value="Return">
+{% endif %}
 </form>
 
+<script>
+    let selectElement = document.getElementById("patient_number");
+    let submitButton = document.getElementById("confirm");
+
+    selectElement.addEventListener("change", function () {
+        if (selectElement.value === "") {
+            submitButton.disabled = true;
+        } else {
+            submitButton.disabled = false;
+        }
+    });
+</script>
+
 </body>
+
 </html>

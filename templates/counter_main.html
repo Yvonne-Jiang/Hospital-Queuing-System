@@ -1,16 +1,53 @@
 <html>
-  <head>
-    <title>Queue System</title>
-  </head>
-  <body>
-    <h1>Hello, {{ branch_name }} {{ counter_name }}</h1>
-    <p>Current calling of {{service}} is {{ current_calling }}</p>
+<head>
+    <title>Counter System</title>
+</head>
+<body>
+<h1>Hello, {{ branch_name }} {{ counter_name }}</h1>
+<h2>You are Now Operating {{ service }} Queue.</h2>
+<table>
+    <thead>
+    <tr>
+        <th>Queuing Details</th>
+    </tr>
+    </thead>
+    <tbody>
 
-    <form action="/{{ branch_name }}/{{ counter_name }}/{{ service }}/queue" method="post">
-      <input type="submit" name="action" value="Next">
-      <input type="submit" name="action" value="Hold">
-      <!-- <input type="submit" name="action" value="Re-schedule">
-      <input type="submit" name="action" value="Set Priority"> -->
-    </form>
-  </body>
+    </tr>
+    <td>Now Serving</td>
+    </tr>
+
+    </tr>
+    {% if now_serving is not none %}
+        <td>{{ now_serving }}</td>
+    {% else %}
+        <tr>
+            <td>Empty Queue</td>
+        </tr>
+    {% endif %}
+    </tr>
+
+    </tr>
+    <td> Next</td>
+    </tr>
+    {% if next_serving is not none %}
+        {% for i in next_serving %}
+            <tr>
+                <td>{{ i }}</td>
+            </tr>
+        {% endfor %}
+    {% else %}
+        <tr>
+            <td>Empty Queue</td>
+        </tr>
+    {% endif %}
+
+    </tbody>
+</table>
+
+<form method="post">
+    <input type="submit" name="action" value="Next">
+    <input type="submit" name="action" value="Hold">
+</form>
+</body>
 </html>

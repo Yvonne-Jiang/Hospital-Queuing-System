@@ -1,11 +1,26 @@
 <!DOCTYPE html>
 <html>
+<meta http-equiv="refresh" content = "5">
 <head>
-  <title>Patient Status</title>
+    <title>Patient Status</title>
 </head>
 <body>
-  <h1>Patient Status</h1>
-  <p>You're queueing for {{ service }} in {{ branch }}.</p>
-  <p>Your queue number is {{ queue_number }}.</p>
+<h1>Patient Status</h1>
+<p>You're queueing for {{ service }} in {{ branch }}.</p>
+
+
+{% if wait > -1 %}
+    <p>Your queue number is {{ queue_number }}.</p>
+    <p>There are {{ wait }} people before you.</p>
+    {% elif wait == -2%}
+    Your number is passed, please find the CRO to reschedule.
+    {% else %}
+    You are not in the queue.
+{% endif %}
+
+<form method="post">
+    <input type="submit" value="Return">
+</form>
+
 </body>
 </html>

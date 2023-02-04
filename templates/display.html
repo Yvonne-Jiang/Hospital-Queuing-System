@@ -1,70 +1,92 @@
 <!DOCTYPE html>
 <html>
-    <meta http-equiv="refresh" content = "2">
+<meta http-equiv="refresh" content="2">
 <head>
     <title>Display</title>
 </head>
 
 <body>
-    <h2>{{branch}}</h2>
+<h2>{{ branch }}</h2>
 
-    <table>
-        <thead>
+<table>
+    <thead>
+    <tr>
+        <th>Examination Queue</th>
+    </tr>
+    </thead>
+    <tbody>
+
+    </tr>
+    <td> Now Serving</td>
+    </tr>
+
+    </tr>
+    {% if ex_now_serving is not none %}
+        <td>{{ ex_now_serving }}</td>
+    {% else %}
+        <tr>
+            <td>Empty Queue</td>
+        </tr>
+    {% endif %}
+    </tr>
+
+    </tr>
+    <td> Next</td>
+    </tr>
+    {% if ex_next_serving is not none %}
+        {% for i in ex_next_serving %}
             <tr>
-                <th>Examination Queue</th>
+                <td>{{ i }}</td>
             </tr>
-        </thead>
-        <tbody>
+        {% endfor %}
+    {% else %}
+        <tr>
+            <td>Empty Queue</td>
+        </tr>
+    {% endif %}
 
-            </tr>
-            <td> Now Serving</td>
-            </tr>
+    </tbody>
+</table>
 
-            </tr>
-            <td>{{ex_now_serving}}</td>
-            </tr>
+<table>
+    <thead>
+    <tr>
+        <th>Consulting Queue</th>
+    </tr>
+    </thead>
+    <tbody>
 
-            </tr>
-            <td> Next </td>
-            </tr>
+    </tr>
+    <td> Now Serving</td>
+    </tr>
 
-            {% for i in ex_next_serving %}
+    </tr>
+    {% if con_now_serving is not none %}
+        <td>{{ con_now_serving }}</td>
+    {% else %}
+        <tr>
+            <td>Empty Queue</td>
+        </tr>
+    {% endif %}
+    </tr>
+
+    </tr>
+    <td> Next</td>
+    </tr>
+    {% if con_next_serving is not none %}
+        {% for i in con_next_serving %}
             <tr>
-                <td>{{i}}</td>
+                <td>{{ i }}</td>
             </tr>
+        {% endfor %}
+    {% else %}
+        <tr>
+            <td>Empty Queue</td>
+        </tr>
+    {% endif %}
 
-            {% endfor %}
-        </tbody>
-    </table>
-
-    <table>
-        <thead>
-            <tr>
-                <th>Consulting Queue</th>
-            </tr>
-        </thead>
-        <tbody>
-
-            </tr>
-            <td> Now Serving</td>
-            </tr>
-
-            </tr>
-            <td>{{con_now_serving}}</td>
-            </tr>
-
-            </tr>
-            <td> Next </td>
-            </tr>
-
-            {% for i in con_next_serving %}
-            <tr>
-                <td>{{i}}</td>
-            </tr>
-            {% endfor %}
-            
-        </tbody>
-    </table>
+    </tbody>
+</table>
 
 </body>
 

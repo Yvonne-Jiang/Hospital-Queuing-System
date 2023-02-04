@@ -1,18 +1,59 @@
 <html>
-<meta http-equiv="refresh" content = "2">
 <head>
-    <title>Queue System</title>
+    <title>Support Customer Relationship Officer System</title>
 </head>
 
 <body>
 <h1> Management for {{ branch_name }} {{ service }}</h1>
 There are {{ normal_num }} people in the normal queue and {{ priority_num }} people in the priority queue.
 The queue is now {{ status }}.
+
+<table>
+    <thead>
+    <tr>
+        <th>Queuing Details</th>
+    </tr>
+    </thead>
+    <tbody>
+
+    </tr>
+    <td>Now Serving</td>
+    </tr>
+
+    </tr>
+    {% if now_serving is not none %}
+        <td>{{ now_serving }}</td>
+    {% else %}
+        <tr>
+            <td>Empty Queue</td>
+        </tr>
+    {% endif %}
+    </tr>
+
+    </tr>
+    <td> Next</td>
+    </tr>
+    {% if next_serving is not none %}
+        {% for i in next_serving %}
+            <tr>
+                <td>{{ i }}</td>
+            </tr>
+        {% endfor %}
+    {% else %}
+        <tr>
+            <td>Empty Queue</td>
+        </tr>
+    {% endif %}
+
+    </tbody>
+</table>
+
 Select the operation:
 
 <form method="post">
     <input type="submit" name="action" value="{{ change_status }}">
     <input type="submit" name="action" value="Re-schedule">
+    <input type="submit" name="action" value="Return">
 </form>
 
 </body>

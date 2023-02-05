@@ -11,6 +11,7 @@
   </head>
 
   <body>
+    <div class = "center">
     <h1>Management for {{ branch }} {{ service }}</h1>
     <div id="content">
       There are {{ normal_num }} people in the normal queue and {{ priority_num
@@ -53,21 +54,23 @@
       </table>
     </div>
 
-    <input
+    Select the operation:
+    <form method="post">
+      <button type="submit" name="action" class = "button" value="{{ change_status }}">
+        {{ change_status }}
+      </button>
+      <button type="submit" name="action" class = "button" value="Re-schedule">
+        Re-schedule
+      </button>
+      <button type="submit" name="action" class = "button" value="Return">Return</button>
+
+      <input
       class="button"
       type="button"
       onclick="javascript:location.reload();"
       value="Refresh" />
 
-    Select the operation:
-    <form method="post">
-      <button type="submit" name="action" value="{{ change_status }}">
-        {{ change_status }}
-      </button>
-      <button type="submit" name="action" value="Re-schedule">
-        Re-schedule
-      </button>
-      <button type="submit" name="action" value="Return">Return</button>
     </form>
+  </div>
   </body>
 </html>

@@ -1,95 +1,89 @@
 <!DOCTYPE html>
 <html>
-<meta http-equiv="refresh" content="2">
-<head>
+  <meta http-equiv="refresh" content="5" />
+  <head>
     <title>Display</title>
-    <link rel="stylesheet" type="text/css" media="screen" href ="/static/css/style.css"/>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      media="screen"
+      href="/static/css/style.css" />
     <title>Counter System</title>
-</head>
+  </head>
 
-<body>
-<h2>{{ branch }}</h2>
+  <body>
+    <div class="center">
+      <h2>{{ branch }} Queue</h2>
 
-<table>
-    <thead>
-    <tr>
-        <th>Examination Queue</th>
-    </tr>
-    </thead>
-    <tbody>
+      <table>
+        <thead>
+          <tr>
+            <th>Examination Queue</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Now Serving</td>
+          </tr>
 
-    </tr>
-    <td> Now Serving</td>
-    </tr>
-
-    </tr>
-    {% if ex_now_serving is not none %}
-        <td>{{ ex_now_serving }}</td>
-    {% else %}
-        <tr>
+          {% if ex_now_serving is not none %}
+          <td>{{ ex_now_serving }}</td>
+          {% else %}
+          <tr>
             <td>Empty Queue</td>
-        </tr>
-    {% endif %}
-    </tr>
+          </tr>
+          {% endif %}
 
-    </tr>
-    <td> Next</td>
-    </tr>
-    {% if ex_next_serving is not none %}
-        {% for i in ex_next_serving %}
-            <tr>
-                <td>{{ i }}</td>
-            </tr>
-        {% endfor %}
-    {% else %}
-        <tr>
+          <tr>
+            <td>Next</td>
+          </tr>
+
+          {% if ex_next_serving is not none %} {% for i in ex_next_serving %}
+          <tr>
+            <td>{{ i }}</td>
+          </tr>
+          {% endfor %} {% else %}
+          <tr>
             <td>Empty Queue</td>
-        </tr>
-    {% endif %}
+          </tr>
+          {% endif %}
+        </tbody>
+      </table>
 
-    </tbody>
-</table>
+      <table>
+        <thead>
+          <tr>
+            <th>Consulting Queue</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Now Serving</td>
+          </tr>
 
-<table>
-    <thead>
-    <tr>
-        <th>Consulting Queue</th>
-    </tr>
-    </thead>
-    <tbody>
-
-    </tr>
-    <td> Now Serving</td>
-    </tr>
-
-    </tr>
-    {% if con_now_serving is not none %}
-        <td>{{ con_now_serving }}</td>
-    {% else %}
-        <tr>
+          {% if con_now_serving is not none %}
+          <td>{{ con_now_serving }}</td>
+          {% else %}
+          <tr>
             <td>Empty Queue</td>
-        </tr>
-    {% endif %}
-    </tr>
+          </tr>
+          {% endif %}
 
-    </tr>
-    <td> Next</td>
-    </tr>
-    {% if con_next_serving is not none %}
-        {% for i in con_next_serving %}
-            <tr>
-                <td>{{ i }}</td>
-            </tr>
-        {% endfor %}
-    {% else %}
-        <tr>
+          <tr>
+            <td>Next</td>
+          </tr>
+          {% if con_next_serving is not none %} {% for i in con_next_serving %}
+          <tr>
+            <td>{{ i }}</td>
+          </tr>
+          {% endfor %} {% else %}
+          <tr>
             <td>Empty Queue</td>
-        </tr>
-    {% endif %}
+          </tr>
+          {% endif %}
+        </tbody>
+      </table>
 
-    </tbody>
-</table>
-
-</body>
-
+    </div>
+  </body>
 </html>

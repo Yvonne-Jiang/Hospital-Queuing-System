@@ -2,10 +2,57 @@ import json
 import os
 import uuid
 
-from flask import Flask, redirect, render_template, request, url_for
+from flask import Flask, jsonify, redirect, render_template, request, url_for
 
-app = Flask(__name__, static_folder='static')
+### Start a day!
+empty_queue = {
+    "branch-1": {
+        "consulting": {
+            "normal_queue": [],
+            "priority_queue": [],
+            "missed_queue": [],
+            "status": "active"
+        },
+        "examination": {
+            "normal_queue": [],
+            "priority_queue": [],
+            "missed_queue": [],
+            "status": "active"
+        }
+    },
+    "branch-2": {
+        "consulting": {
+            "normal_queue": [],
+            "priority_queue": [],
+            "missed_queue": [],
+            "status": "active"
+        },
+        "examination": {
+            "normal_queue": [],
+            "priority_queue": [],
+            "missed_queue": [],
+            "status": "active"
+        }
+    },
+    "branch-3": {
+        "consulting": {
+            "normal_queue": [],
+            "priority_queue": [],
+            "missed_queue": [],
+            "status": "active"
+        },
+        "examination": {
+            "normal_queue": [],
+            "priority_queue": [],
+            "missed_queue": [],
+            "status": "active"
+        }
+    }
+}
 
+d = {}
+
+### Data structure
 
 class ServiceQueue:
 
@@ -112,6 +159,7 @@ class ServiceQueue:
     def reInitiateQueue(self):
         self.status = "active"
 
+# Functions
 
 def read_queue():
     if os.path.exists("queue.txt"):
@@ -119,50 +167,7 @@ def read_queue():
             return json.load(f)
     else:
         print("create queue")
-        return {
-            "branch-1": {
-                "consulting": {
-                    "normal_queue": [],
-                    "priority_queue": [],
-                    "missed_queue": [],
-                    "status": "active"
-                },
-                "examination": {
-                    "normal_queue": [],
-                    "priority_queue": [],
-                    "missed_queue": [],
-                    "status": "active"
-                }
-            },
-            "branch-2": {
-                "consulting": {
-                    "normal_queue": [],
-                    "priority_queue": [],
-                    "missed_queue": [],
-                    "status": "active"
-                },
-                "examination": {
-                    "normal_queue": [],
-                    "priority_queue": [],
-                    "missed_queue": [],
-                    "status": "active"
-                }
-            },
-            "branch-3": {
-                "consulting": {
-                    "normal_queue": [],
-                    "priority_queue": [],
-                    "missed_queue": [],
-                    "status": "active"
-                },
-                "examination": {
-                    "normal_queue": [],
-                    "priority_queue": [],
-                    "missed_queue": [],
-                    "status": "active"
-                }
-            }
-        }
+        return empty_queue
 
 
 def write_queue(queue):
@@ -180,14 +185,14 @@ def read_service_queue(queue, branch, service):
     return s
 
 
-def getQueueNumber(queue, prefix="A"):
-    if not queue:
-        return prefix + '001'
-    idx = []
-    for p in queue:
-        if p['queue_number'][0] == prefix:
-            idx.append(int(p['queue_number'][-3:]))
-    return prefix + str(max(idx) + 1).zfill(3)
+def getQueueNumber(branch, service, priority_type, prefix):
+    if (branch, service, priority_type) in d:
+        d[(branch, service, priority_type)] += 1
+    else:
+        d[(branch, service, priority_type)] = 1
+    with open("queue_num.txt", "w") as f:
+        f.write(str(d))
+    return prefix + str(d[(branch, service, priority_type)]).zfill(3)
 
 
 def write_service_queue(current_queue, queue, branch, service):
@@ -211,7 +216,10 @@ def get_short_id():
     return "".join(buffer)
 
 
+
+app = Flask(__name__, static_folder='static')
 ##### Patient #####
+
 
 @app.route("/patient/main", methods=["GET", "POST"])
 def patient_main():
@@ -224,7 +232,7 @@ def patient_main():
         if priority_type == "priority_queue":
             prefix = prefix.lower()
         new_patient = {'patient_id': get_short_id(), 'queue_number': getQueueNumber(
-            eval("current_queue." + priority_type), prefix)}
+            branch, service, priority_type, prefix)}
         current_queue.enqueue(new_patient, priority_type)
         write_service_queue(current_queue, queue, branch, service)
         write_queue(queue)
@@ -259,22 +267,20 @@ def counter(branch, service, counter):
             current_queue.next()
             write_service_queue(current_queue, queue, branch, service)
             write_queue(queue)
-
         elif request.form['action'] == 'Hold':
-            print("Next")
+            print("Hold")
             current_queue.hold()
             write_service_queue(current_queue, queue, branch, service)
             write_queue(queue)
-
-    now_serving = current_queue.front()
-    next_serving = current_queue.nextThree()
-    return render_template('counter_main.html', branch_name=branch, service=service, counter_name=counter,
+        now_serving = current_queue.front()
+        next_serving = current_queue.nextThree()
+    return render_template('counter_main.html', branch=branch, service=service, counter_name=counter,
                            now_serving=now_serving, next_serving=next_serving)
 
 
-##### CRO #####
+##### cro #####
 
-@app.route("/CRO/main", methods=['GET', 'POST'])
+@app.route("/cro/main", methods=['GET', 'POST'])
 def cro_main():
     queue = read_queue()
     if request.method == 'POST':
@@ -283,7 +289,7 @@ def cro_main():
     return render_template("cro_main.html", queue=queue)
 
 
-@app.route("/CRO/<branch>/<service>/queue", methods=['GET', 'POST'])
+@app.route("/cro/<branch>/<service>/queue", methods=['GET', 'POST'])
 def cro_queue(branch, service):
     queue = read_queue()
     current_queue = read_service_queue(queue, branch, service)
@@ -315,14 +321,12 @@ def cro_queue(branch, service):
         elif request.form['action'] == 'Re-schedule':
             return redirect(url_for("reschedule", branch=branch, service=service))
 
-    return render_template('cro_queue.html', branch_name=branch, service=service, normal_num=normal_num,
+    return render_template('cro_queue.html', branch=branch, service=service, normal_num=normal_num,
                            priority_num=priority_num, status=status, change_status=change_status,
                            now_serving=now_serving, next_serving=next_serving)
 
 
-
-
-@app.route('/CRO/<branch>/<service>/queue/reschedule', methods=['GET', 'POST'])
+@app.route('/cro/<branch>/<service>/queue/reschedule', methods=['GET', 'POST'])
 def reschedule(branch, service):
     queue = read_queue()
     current_queue = read_service_queue(queue, branch, service)
@@ -341,7 +345,7 @@ def reschedule(branch, service):
             write_queue(queue)
         return redirect(url_for("cro_queue", branch=branch, service=service))
 
-    return render_template('reschedule.html', branch_name=branch, service=service, normal_num=normal_num,
+    return render_template('reschedule.html', branch=branch, service=service, normal_num=normal_num,
                            priority_num=priority_num, status=status, change_status=change_status,
                            missed_nums=missed_nums, now_serving=now_serving, next_serving=next_serving)
 

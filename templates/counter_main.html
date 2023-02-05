@@ -1,53 +1,100 @@
 <html>
-<head>
+  <head>
     <title>Counter System</title>
-</head>
-<body>
-<h1>Hello, {{ branch_name }} {{ counter_name }}</h1>
-<h2>You are Now Operating {{ service }} Queue.</h2>
-<table>
-    <thead>
-    <tr>
-        <th>Queuing Details</th>
-    </tr>
-    </thead>
-    <tbody>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      media="screen"
+      href="/static/css/style.css" />
+    <style type="text/css">
+      .button {
+        padding: 10px 16px;
+        background: #009879;
+        box-shadow: 0 4px 4px rgba(127, 127, 127, 0.3);
+        display: inline-block;
+        color: #fff;
+        font-size: 12px;
+        border-radius: 4px;
+        transition: all 0.2s;
+        margin: 18px;
+      }
+      .button:hover {
+        background: #1dc6a4;
+      }
+    </style>
+    <title>Counter System</title>
+  </head>
+  <body>
+    <h1>Hello, {{ branch }} {{ counter_name }}</h1>
+    <h2>You are Now Operating {{ service }} Queue.</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Queuing Details</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Now Serving</td>
+        </tr>
 
-    </tr>
-    <td>Now Serving</td>
-    </tr>
-
-    </tr>
-    {% if now_serving is not none %}
+        {% if now_serving is not none %}
         <td>{{ now_serving }}</td>
-    {% else %}
+        {% else %}
         <tr>
-            <td>Empty Queue</td>
+          <td>Empty Queue</td>
         </tr>
-    {% endif %}
-    </tr>
-
-    </tr>
-    <td> Next</td>
-    </tr>
-    {% if next_serving is not none %}
-        {% for i in next_serving %}
-            <tr>
-                <td>{{ i }}</td>
-            </tr>
-        {% endfor %}
-    {% else %}
+        {% endif %}
         <tr>
-            <td>Empty Queue</td>
+          <td>Next</td>
         </tr>
-    {% endif %}
+        {% if next_serving is not none %} {% for i in next_serving %}
+        <tr>
+          <td>{{ i }}</td>
+        </tr>
+        {% endfor %} {% else %}
+        <tr>
+          <td>Empty Queue</td>
+        </tr>
+        {% endif %}
+      </tbody>
+    </table>
 
-    </tbody>
-</table>
+    <form method="post">
+      <button
+        class="button"
+        type="submit"
+        name="action"
+        onclick="nextMessage()"
+        value="Next">
+        Next
+      </button>
+      <button
+        class="button"
+        type="submit"
+        name="action"
+        onclick="holdMessage()"
+        value="Hold">
+        Hold
+      </button>
+    </form>
 
-<form method="post">
-    <input type="submit" name="action" value="Next">
-    <input type="submit" name="action" value="Hold">
-</form>
-</body>
+    <input
+      class="button"
+      type="button"
+      onclick="javascript:location.assign(window.location.href);"
+      value="Refresh" />
+
+    <script>
+      function nextMessage() {
+        let message = "{{ now_serving }} has been served.";
+        alert(message);
+      }
+
+      function holdMessage() {
+        let message = "{{ now_serving }} has been hold.";
+        alert(message);
+      }
+    </script>
+  </body>
 </html>

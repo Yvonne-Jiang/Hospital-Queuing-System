@@ -1,15 +1,21 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>Support Customer Relationship Officer Main</title>
-</head>
+  <head>
+    <title>Support Customer Relationship Officer Main</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      media="screen"
+      href="/static/css/style.css" />
+    <title>Counter System</title>
+  </head>
 
-<body>
+  <body>
+    <h1>Please Choose the Queue You want to manage:</h1>
 
-  <h1>Please Choose the Queue You want to manage: </h1>
-
-<form method="post" onsubmit="return validateForm()">
-    <table>
+    <form method="post" id="form_content" onsubmit="return validateForm()">
+      <table>
         <thead>
           <tr>
             <th>Branch</th>
@@ -19,35 +25,50 @@
         </thead>
         <tbody>
           {% for branch, services in queue.items() %}
-              <tr>
-                <td>{{ branch }}</td>
-                {% for service, queue_info in services.items() %}
-                <td> <input type="radio" name="branch_service" value="{{branch}}_{{service}}"/> {{ (queue_info.normal_queue|length) + (queue_info.priority_queue|length) }} in Queue (Status: {{queue_info.status}})</td>
-                {% endfor %}
-              </tr>
+          <tr>
+            <td>{{ branch }}</td>
+            {% for service, queue_info in services.items() %}
+            <td>
+              <input
+                type="radio"
+                name="branch_service"
+                value="{{branch}}_{{service}}" />
+              {{ (queue_info.normal_queue|length) +
+              (queue_info.priority_queue|length) }} in Queue (Status:
+              {{queue_info.status}})
+            </td>
             {% endfor %}
+          </tr>
+          {% endfor %}
         </tbody>
       </table>
 
-      <button type="submit" name="action" value="Confirm"> Confirm </button>
+      <button class="button" type="submit" name="action" value="Confirm">
+        Confirm
+      </button>
+    </form>
 
-      </form>
-<script>
-    function validateForm() {
+    <input
+      class="button"
+      type="button"
+      onclick="javascript:location.reload();"
+      value="Refresh" />
+
+    <script>
+      function validateForm() {
         let radioButtons = document.getElementsByName("branch_service");
         let checked = false;
         for (let i = 0; i < radioButtons.length; i++) {
-            if (radioButtons[i].checked) {
-                checked = true;
-            }
+          if (radioButtons[i].checked) {
+            checked = true;
+          }
         }
         if (!checked) {
-            alert("Please select an branch and option");
-            return false;
+          alert("Please select an branch and option");
+          return false;
         }
         return true;
-    }
-</script>
-</body>
-
+      }
+    </script>
+  </body>
 </html>

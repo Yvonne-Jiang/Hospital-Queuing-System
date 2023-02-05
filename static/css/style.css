@@ -1,23 +1,39 @@
-.content-table {
-    border-collapse: collapse;
-    margin: 25px 0;
-    font-size: 0.9em;
-    min-width: 400px;
-    text-align: center;
+table {
+  border-collapse: collapse;
+  margin: 25px 0;
+  font-size: 0.9em;
+  min-width: 400px;
+  text-align: center;
 }
 
-.content-table thead tr {
-    background-color: #009879;
-    color: #ffffff;
-    text-align: left;
-    font-weight: bold;
+table thead tr {
+  background-color: #009879;
+  color: #ffffff;
+  text-align: center;
+  font-weight: bold;
 }
 
-.content-table th,
-.content-table td {
-    padding: 12px 15px;
+table th,
+table td {
+  padding: 12px 15px;
 }
 
-.content-table tbody tr {
-    border-bottom: 1px solid #dddddd;
+table tbody tr {
+  border-bottom: 1px solid #dddddd;
+}
+
+.button {
+  padding: 10px 16px;
+  background: #009879;
+  box-shadow: 0 4px 4px rgba(127, 127, 127, 0.3);
+  display: inline-block;
+  color: #fff;
+  font-size: 12px;
+  border-radius: 4px;
+  transition: all 0.2s;
+  margin: 18px;
+}
+
+.btn-1:hover {
+  background: #1dc6a4;
 }

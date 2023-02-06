@@ -50,7 +50,6 @@ empty_queue = {
     }
 }
 
-d = {}
 
 ### Data structure
 
@@ -161,6 +160,14 @@ class ServiceQueue:
 
 # Functions
 
+def read_queue_num():
+    if os.path.exists("queue_num.txt"):
+        with open("queue_num.txt", "r") as f:
+            return eval(f.read())
+    else:
+        print("create queue")
+        return {}
+    
 def read_queue():
     if os.path.exists("queue.txt"):
         with open("queue.txt", "r") as f:
@@ -186,6 +193,7 @@ def read_service_queue(queue, branch, service):
 
 
 def getQueueNumber(branch, service, priority_type, prefix):
+    d = read_queue_num()
     if (branch, service, priority_type) in d:
         d[(branch, service, priority_type)] += 1
     else:

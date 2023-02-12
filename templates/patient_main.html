@@ -13,6 +13,10 @@
 
   <body>
     <div class="center">
+      <div class="wrap">
+      <img src="/static/image/hospital.png" height = "70" width="70">
+      <h1>&nbsp; Welcome to IFAND hospital</h1>
+      </div>
       <h2>Please Select the Branch and Service</h2>
 
       <form method="post" id="form_content" onsubmit="return validateForm()">
@@ -48,6 +52,7 @@
             {% endfor %}
           </tbody>
         </table>
+        <div class="wrap">
         <button
           class="button"
           type="submit"
@@ -69,6 +74,7 @@
         type="button"
         onclick="javascript:location.reload();"
         value="Refresh" />
+      </div>
 
       <script>
         function validateForm() {

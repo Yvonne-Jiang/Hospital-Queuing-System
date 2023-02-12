@@ -93,12 +93,15 @@
       <form method="post">
         <label for="patient_number">Select Patient:</label>
         {% if missed_nums|length > 0 %}
+        <div class="dropdown">
         <select id="patient_number" name="patient_number">
           <option value="">---Select---</option>
           {% for patient in missed_nums %}
           <option value="{{ patient }}">{{ patient }}</option>
+        </div>
           {% endfor %}
         </select>
+
         <button
           class="button"
           type="submit"

@@ -11,6 +11,8 @@
   <body>
     <div class="center">
       <h1>Patient Status</h1>
+      <div class="div1">
+      <img src="/static/image/printer.png" height = "50" width="50">
       <h2>You're queueing for {{ service }} in {{ branch }}.</h2>
 
       {% if wait > -1 %}
@@ -21,16 +23,19 @@
       {% else %}
       <h2>You are not in the queue.</h2>
       {% endif %}
+      </div>
 
       <form method="post">
+      <div class="wrap">
         <button class="button" type="submit" value="Return">Return</button>
       </form>
-
+      
       <input
         class="button"
         type="button"
         onclick="javascript:location.reload();"
         value="Refresh" />
+      </div>
     </div>
   </body>
 </html>

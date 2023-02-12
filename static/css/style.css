@@ -43,3 +43,55 @@ table tbody tr {
   text-align: center;
   margin:0 auto;
 }
+
+.wrap img{
+  vertical-align: middle;
+}
+
+.wrap h1{
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.wrap button{
+  vertical-align: middle;
+}
+
+.wrap input{
+  vertical-align: middle;
+}
+
+.div1 {
+  background-color:rgba(22, 174, 239, 0.38);
+  border-radius: 25px;
+  width: 550px;
+  height: 250px;
+  text-align: center;
+  margin:0 auto
+}
+
+.div2, .div3{
+  display: inline-block;
+}
+
+.wrap table{
+  display:flex;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+#patient_number {
+  width: 150px;
+  height: 25px;
+  font-size: 15px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 2px;
+  background-color: rgba(41, 142, 78, 0.38);
+}
+
+
+

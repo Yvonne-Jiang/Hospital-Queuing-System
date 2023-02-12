@@ -19,7 +19,7 @@ http://127.0.0.1:8080/patient/main
 
 ### For counter:
 
-http://127.0.0.1:8000/&ltbranch&gt/&ltcounter&gt/&ltservice_type&gt/queue
+http://127.0.0.1:8000/&lt;branch&gt;/&lt;counter&gt;/&lt;service_type&gt;/queue
 
 Please change the branch number, counter number and service type before entering the page
 
